@@ -8,6 +8,7 @@ import objects.Message;
 import objects.User;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class BroServer {
             User currentUser = users.get(i);
             if(currentUser.uuid.equals(token)) {
                 System.out.println("Logging User In");
-                SignInResponse.createSuccessMessage(currentUser.uuid, currentUser.broName);
+                return SignInResponse.createSuccessMessage(currentUser.uuid, currentUser.broName);
             }
         }
 
@@ -131,15 +132,15 @@ public class BroServer {
         return null;
     }
 
-    public static boolean addBro(String uuid, Bro bro) {
+    public static ArrayList<Bro> addBro(String uuid, Bro bro) {
 
         for(User user: users) {
-            if (user.uuid.equals(uuid)) {
+            if (user.uuid.equals(uuid) && !user.getBros().contains(bro)) {
                 user.addBro(bro);
-                return true;
+                return user.getBros();
             }
         }
-        return false;
+        return null;
     }
 
     public static boolean removeBro(String uuid, String broName) {
@@ -161,7 +162,7 @@ public class BroServer {
         for (User user: users) {
             if (user.uuid.equals(uuid)) {
                 for (Bro bro: user.getBros()) {
-                    if (bro.broName.equals(broName)) {
+                    if (bro.broName.equals(broName) && !user.blocked.contains(bro)) {
                         user.blockBro(bro);
                         return true;
                     }

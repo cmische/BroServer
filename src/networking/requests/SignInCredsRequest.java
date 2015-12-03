@@ -16,7 +16,7 @@ public class SignInCredsRequest {
     public SignInCredsRequest(ServerRequest request) {
         serverRequest = request;
 
-        ArrayList<byte[]> blocks = DataMessage.getBlocks(serverRequest.getDataBytes());
+        ArrayList<byte[]> blocks = DataMessage.getBlocks(serverRequest.getRequestBytes());
         broName = new String (blocks.get(0));
         password = new String (blocks.get(1));
         gcmId = new String (blocks.get(2));

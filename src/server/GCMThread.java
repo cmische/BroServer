@@ -27,7 +27,7 @@ public class GCMThread extends Thread {
             System.out.println("Started GCM communication on port: " + serverPort);
 
             //write json string
-            String jsonString = "{\"to\":" + "\"" + toNumber + "\", \"data\":\"[\"" + messageID + "\":\"848844858\"]\"}";
+            String jsonString = "{\"to\":" + "\"" + toNumber + "\", \"data\":\"[\"messageID\":\"" + messageID + "\"]\"}";
 
             //send post request
             BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));

@@ -4,6 +4,7 @@ import networking.Bro;
 import networking.BroMessage;
 import networking.requests.*;
 import networking.responses.BroMessageResponse;
+import networking.responses.ErrorResponse;
 import networking.responses.GetBrosResponse;
 import networking.responses.SignInResponse;
 import objects.Message;
@@ -94,12 +95,19 @@ public class ServerProcessRequestThread extends Thread {
                     Bro bro = BroServer.createBro(addBroRequest.getBroName());
 
                     //try adding bro
-                    boolean broAdded = false;
                     if(bro != null) {
-                        broAdded = BroServer.addBro(addBroRequest.getToken(), bro);
-                    } else
-
-                    System.out.println("Added bro successfully = " + broAdded);
+                        ArrayList<Bro> addBroList = BroServer.addBro(addBroRequest.getToken(), bro);
+                        if (addBroList != null) {
+                            response = GetBrosResponse.createSuccessMessage(addBroList.toArray(new Bro[addBroList.size()]));
+                            System.out.println("Bro Added.");
+                        } else {
+                            response = GetBrosResponse.createSuccessMessage(new Bro[0]);
+                            System.out.println("Failed to add bro");
+                        }
+                    } else {
+                        response = GetBrosResponse.createSuccessMessage(new Bro[0]);
+                        System.out.println("Failed to add bro");
+                    }
 
                     break;
                 case UpdateLocation:
@@ -112,6 +120,7 @@ public class ServerProcessRequestThread extends Thread {
 
                     System.out.println("Updated location successfully = " + updated);
 
+                    response = ErrorResponse.createMessage(updated, new byte[0]);
 
                     break;
                 case RemoveBro:

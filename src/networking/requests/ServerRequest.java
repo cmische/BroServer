@@ -55,9 +55,9 @@ public class ServerRequest extends DataMessage {
         }
 
         if(cachedRequestBytes == null) {
-            cachedRequestBytes = new byte[getDataBytes().length];
-            for(int i=1;i<cachedRequestBytes.length;i++) {
-                cachedRequestBytes[i] = getDataBytes()[i];
+            cachedRequestBytes = new byte[getDataBytes().length - 1];
+            for(int i=0;i<getDataBytes().length - 1;i++) {
+                cachedRequestBytes[i] = getDataBytes()[i + 1];
             }
         }
 

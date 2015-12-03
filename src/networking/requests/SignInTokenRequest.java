@@ -5,9 +5,6 @@ import networking.DataMessage;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Created by closestudios on 11/23/15.
- */
 public class SignInTokenRequest {
 
 
@@ -19,7 +16,7 @@ public class SignInTokenRequest {
         serverRequest = request;
 
 
-        ArrayList<byte[]> blocks = DataMessage.getBlocks(serverRequest.getDataBytes());
+        ArrayList<byte[]> blocks = DataMessage.getBlocks(serverRequest.getRequestBytes());
         token = new String (blocks.get(0));
         gcmId = new String (blocks.get(1));
 
