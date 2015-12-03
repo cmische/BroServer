@@ -172,6 +172,21 @@ public class BroServer {
         return false;
     }
 
+    public static boolean blockBro(String uuid, String broName) {
+        //block bro
+        for (User user: users) {
+            if (user.uuid.equals(uuid)) {
+                for (Bro bro: user.getBros()) {
+                    if (bro.broName.equals(broName)) {
+                        user.blockBro(bro);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean updateLocation(String uuid, BroLocation location) {
         for (User user: users) {
             if (user.uuid.equals(uuid)) {

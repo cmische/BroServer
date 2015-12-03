@@ -27,9 +27,9 @@
         <entry file="file://$PROJECT_DIR$/src/server/BroServer.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="166" column="51" selection-start-line="166" selection-start-column="51" selection-end-line="166" selection-end-column="51" />
+              <caret line="186" column="21" selection-start-line="186" selection-start-column="21" selection-end-line="186" selection-end-column="21" />
               <folding>
-                <element signature="e#5565#5571#0" expanded="true" />
+                <element signature="e#6003#6009#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -57,11 +57,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="User.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="User.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/objects/User.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="61" column="21" selection-start-line="61" selection-start-column="21" selection-end-line="61" selection-end-column="21" />
+            <state vertical-scroll-proportion="0.6052632">
+              <caret line="43" column="25" selection-start-line="43" selection-start-column="25" selection-end-line="43" selection-end-column="25" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -101,11 +101,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ServerProcessRequestThread.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ServerProcessRequestThread.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/server/ServerProcessRequestThread.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.34539473">
-              <caret line="123" column="30" selection-start-line="123" selection-start-column="30" selection-end-line="123" selection-end-column="30" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="130" column="80" selection-start-line="130" selection-start-column="80" selection-end-line="130" selection-end-column="80" />
               <folding />
             </state>
           </provider>
@@ -166,11 +166,11 @@
         <option value="$PROJECT_DIR$/src/networking/requests/UpdateLocationRequest.java" />
         <option value="$PROJECT_DIR$/src/server/ServerPingThread.java" />
         <option value="$PROJECT_DIR$/src/networking/ServerApiCalls.java" />
-        <option value="$PROJECT_DIR$/src/objects/User.java" />
         <option value="$PROJECT_DIR$/src/networking/Bro.java" />
         <option value="$PROJECT_DIR$/src/networking/BroLocation.java" />
         <option value="$PROJECT_DIR$/src/server/BroServer.java" />
         <option value="$PROJECT_DIR$/src/server/ServerProcessRequestThread.java" />
+        <option value="$PROJECT_DIR$/src/objects/User.java" />
       </list>
     </option>
   </component>
@@ -605,12 +605,12 @@
       <option name="number" value="Default" />
       <updated>1449004831123</updated>
       <workItem from="1449004832566" duration="11016000" />
-      <workItem from="1449096052002" duration="9982000" />
+      <workItem from="1449096052002" duration="10487000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="20998000" />
+    <option name="totallyTimeSpent" value="21503000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="13" y="60" width="1346" height="728" extended-state="0" />
@@ -667,7 +667,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="144" column="34" selection-start-line="144" selection-start-column="34" selection-end-line="144" selection-end-column="34" />
           <folding>
-            <element signature="e#5565#5571#0" expanded="true" />
+            <element signature="e#6003#6009#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -885,16 +885,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/objects/User.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="61" column="21" selection-start-line="61" selection-start-column="21" selection-end-line="61" selection-end-column="21" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/networking/Bro.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -916,18 +906,28 @@
     <entry file="file://$PROJECT_DIR$/src/server/BroServer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="166" column="51" selection-start-line="166" selection-start-column="51" selection-end-line="166" selection-end-column="51" />
+          <caret line="186" column="21" selection-start-line="186" selection-start-column="21" selection-end-line="186" selection-end-column="21" />
           <folding>
-            <element signature="e#5565#5571#0" expanded="true" />
+            <element signature="e#6003#6009#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/server/ServerProcessRequestThread.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.34539473">
-          <caret line="123" column="30" selection-start-line="123" selection-start-column="30" selection-end-line="123" selection-end-column="30" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="130" column="80" selection-start-line="130" selection-start-column="80" selection-end-line="130" selection-end-column="80" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/objects/User.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6052632">
+          <caret line="43" column="25" selection-start-line="43" selection-start-column="25" selection-end-line="43" selection-end-column="25" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

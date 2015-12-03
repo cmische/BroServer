@@ -122,6 +122,13 @@ public class ServerProcessRequestThread extends Thread {
 
                     break;
                 case BlockBro:
+                    //create request
+                    BlockBroRequest blockBroRequest = new BlockBroRequest(serverRequest);
+
+                    //try to block bro
+                    boolean blocked = BroServer.blockBro(blockBroRequest.getToken(), blockBroRequest.getBroName());
+
+                    System.out.println("Blocked bro successfully = " + blocked);
                     break;
                 case SignInToken:
                     // Create request
