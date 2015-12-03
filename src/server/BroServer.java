@@ -206,7 +206,9 @@ public class BroServer {
         for(Bro bro : user.getBros()) {
             for (int i = 0; i < matches.size(); i++)  {
                 if(matches.get(i).broName.equals(bro.broName)) {
-                    if (matches.get(i).nearBy(user.location) && bro.recentlyNearBy) {
+                    BroLocation broCurrentLocation = matches.get(i).compareLocation(user.location);
+                    if ((broCurrentLocation != null) && bro.recentlyNearBy) {
+                        bro.location = broCurrentLocation;
                         bro.recentlyNearBy = true;
                         if (user.location.pingTime != null) {
                             bro.totalTimeSecs += ((location.pingTime.getTime() - user.location.pingTime.getTime())/1000);
@@ -269,8 +271,16 @@ public class BroServer {
         return false;
     }
 
-    public static boolean getBroMessage() {
-        return false;
+    public static Message getBroMessage(String messageId) throws IOException, InterruptedException{
+        //retrieve message
+        for (Message message: messages) {
+            if (message.messageID.equals(messageId)) {
+                messages.remove(message); //remove message already read
+                saveMessages(); //save newly changed list
+                return message;
+            }
+        }
+        return null;
     }
 
     public static void loadUsers() throws IOException, ClassNotFoundException {

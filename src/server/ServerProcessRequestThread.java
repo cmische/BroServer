@@ -1,9 +1,12 @@
 package server;
 
 import networking.Bro;
+import networking.BroMessage;
 import networking.requests.*;
+import networking.responses.BroMessageResponse;
 import networking.responses.GetBrosResponse;
 import networking.responses.SignInResponse;
+import objects.Message;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -155,6 +158,21 @@ public class ServerProcessRequestThread extends Thread {
 
                     break;
                 case GetBroMessage:
+
+                    //create request
+                    GetBroMessageRequest getBroMessageRequest = new GetBroMessageRequest(serverRequest);
+
+                    //try to get message
+                    Message message = BroServer.getBroMessage(getBroMessageRequest.getMessageId());
+
+                    //respond with message
+                    if (message != null) {
+                        response = BroMessageResponse.createSuccessMessage(new BroMessage(message.messageTitle,
+                                message.messageDetails, message.audioBytes));
+                    } else {
+                        response = BroMessageResponse.createErrorMessage("Failed to get message");
+                    }
+
                     break;
             }
 

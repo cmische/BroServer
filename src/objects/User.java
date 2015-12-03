@@ -3,6 +3,7 @@ package objects;
 import networking.Bro;
 import networking.BroLocation;
 
+import javax.xml.stream.Location;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -53,13 +54,13 @@ public class User  implements Serializable{
         }
     }
 
-    public boolean nearBy(BroLocation broLocation) {
+    public BroLocation compareLocation(BroLocation broLocation) {
         double distance = distance(broLocation.latitude, this.location.latitude, broLocation.longitude,
                 this.location.longitude);
         if (distance <= 20) {
-            return true;
+            return this.location;
         }
-        return false;
+        return null;
     }
 
 
