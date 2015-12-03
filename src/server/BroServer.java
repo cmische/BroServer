@@ -2,7 +2,9 @@ package server;
 
 import networking.Bro;
 import networking.BroLocation;
+import networking.BroMessage;
 import networking.responses.SignInResponse;
+import objects.Message;
 import objects.User;
 
 import java.io.*;
@@ -15,9 +17,9 @@ import java.util.UUID;
 public class BroServer {
 
     static ArrayList<User> users;
-//    static Directory directory;
+    static ArrayList<Message> messages;
     static boolean userLock = false;
-//    static boolean directoryLock = false;
+    static boolean messageLock = false;
 
     public static void main(String[] args) {
 
@@ -25,9 +27,8 @@ public class BroServer {
         try {
             // Init Users
             loadUsers();
-
-            // Init Directory
-//            loadDirectory();
+            // Init messages
+            loadMessages();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -44,12 +45,6 @@ public class BroServer {
         // Create (Main Connection Thread)
         ServerMainThread serverMainThread = new ServerMainThread(9090);
         serverMainThread.start();
-
-        // Create Ping (Hello Thread)
-//        ServerPingThread serverPingThread = new ServerPingThread(9091);
-//        serverPingThread.start();
-
-
     }
 
     public static ArrayList<Bro> getBros(String uuid) throws IOException, InterruptedException {
@@ -114,17 +109,6 @@ public class BroServer {
         return SignInResponse.createErrorMessage("Expired token.");
     }
 
-//    public static boolean pingUser(String uuid, String ipAddress) throws IOException, InterruptedException {
-//        for(int i=0;i<users.size();i++) {
-//            if(users.get(i).uuid.equals(uuid)) {
-//                users.get(i).pingUser(ipAddress);
-//                saveUsers();
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
     public static boolean existingBroName(String name) {
 
         for(int i=0;i<users.size();i++) {
@@ -251,6 +235,44 @@ public class BroServer {
         return false;
     }
 
+    public static boolean repeatMessageId(String messageID) {
+        for(int i=0;i<messages.size();i++) {
+            if(messages.get(i).messageID.equals(messageID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean sendBroMessage(String broName, BroMessage broMessage) throws IOException, InterruptedException {
+        //create unique message id
+        String messageId = UUID.randomUUID().toString();
+        while(repeatMessageId(messageId)) {
+            messageId = UUID.randomUUID().toString();
+        }
+        //create message to store
+        Message message = new Message(broMessage, messageId);
+
+        //store message
+        messages.add(message);
+        saveMessages(); // save new message
+
+        //send to bro
+        //notify bro using gcm
+        for (User user: users) {
+            if (user.broName.equals(broName)) {
+                new GCMThread(9096, user.gcm, message.messageID);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean getBroMessage() {
+        return false;
+    }
+
     public static void loadUsers() throws IOException, ClassNotFoundException {
         File file = new File("users.bytes");
         if(file.exists()) {
@@ -265,25 +287,7 @@ public class BroServer {
             users = new ArrayList<>();
         }
     }
-//
-//    public static void loadDirectory() throws IOException, ClassNotFoundException {
-//        File file = new File("directory.bytes");
-//        if(file.exists()) {
-//            System.out.println("Loaded Directory!");
-//            FileInputStream f = new FileInputStream(file);
-//            ObjectInputStream s = new ObjectInputStream(f);
-//            Directory c = (Directory) s.readObject();
-//            s.close();
-//            directory = c;
-//        } else {
-//            System.out.println("New Directory!");
-//            directory = new Directory();
-//        }
-//    }
-//
-//
-//
-//
+
     public static boolean saveUsers() throws IOException, InterruptedException {
         while(userLock) {
             Thread.sleep(10);
@@ -297,19 +301,34 @@ public class BroServer {
         userLock = false;
         return true;
     }
-//
-//    public static boolean saveDirectory() throws IOException, InterruptedException {
-//        while(directoryLock) {
-//            Thread.sleep(10);
-//        }
-//        directoryLock = true;
-//        File file = new File("directory.bytes");
-//        FileOutputStream f = new FileOutputStream(file);
-//        ObjectOutputStream s = new ObjectOutputStream(f);
-//        s.writeObject(directory);
-//        s.close();
-//        directoryLock = false;
-//        return true;
-//    }
+
+    public static void loadMessages() throws IOException, ClassNotFoundException {
+        File file = new File("messages.bytes");
+        if(file.exists()) {
+            System.out.println("Loaded messages!");
+            FileInputStream f = new FileInputStream(file);
+            ObjectInputStream s = new ObjectInputStream(f);
+            ArrayList<Message> c = (ArrayList<Message>) s.readObject();
+            s.close();
+            messages = c;
+        } else {
+            System.out.println("New messages!");
+            messages = new ArrayList<>();
+        }
+    }
+
+    public static boolean saveMessages() throws IOException, InterruptedException {
+        while(messageLock) {
+            Thread.sleep(10);
+        }
+        messageLock = true;
+        File file = new File("message.bytes");
+        FileOutputStream f = new FileOutputStream(file);
+        ObjectOutputStream s = new ObjectOutputStream(f);
+        s.writeObject(messages);
+        s.close();
+        messageLock = false;
+        return true;
+    }
 
 }

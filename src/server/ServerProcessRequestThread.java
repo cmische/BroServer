@@ -38,6 +38,7 @@ public class ServerProcessRequestThread extends Thread {
             byte[] response = new byte[0];
             switch (serverRequest.getRequestType()) {
                 case SignUp:
+                    //create request
                     SignUpRequest signUpRequest = new SignUpRequest(serverRequest);
 
                     // Registers Computer
@@ -138,6 +139,20 @@ public class ServerProcessRequestThread extends Thread {
                     response = BroServer.signInToken(signInTokenRequest.getToken());
                     break;
                 case SendBroMessage:
+
+                    //create request
+                    SendBroMessageRequest sendBroMessageRequest = new SendBroMessageRequest(serverRequest);
+
+                    //try to send Bro message
+                    boolean messageSent = BroServer.sendBroMessage(sendBroMessageRequest.getBroName(),
+                            sendBroMessageRequest.getBroMessage());
+
+                    if (messageSent) {
+                        System.out.println("Your message has sent");
+                    } else {
+                        System.out.println("Failed to send message");
+                    }
+
                     break;
                 case GetBroMessage:
                     break;
