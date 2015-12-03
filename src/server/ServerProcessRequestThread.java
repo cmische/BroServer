@@ -1,11 +1,9 @@
 package server;
 
-import clientservermessages.UpdateFilesRequest;
 import networking.Bro;
 import networking.requests.*;
 import networking.responses.GetBrosResponse;
 import networking.responses.SignInResponse;
-import objects.SearchResult;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,13 +86,40 @@ public class ServerProcessRequestThread extends Thread {
                     //create request
                     AddBroRequest addBroRequest = new AddBroRequest(serverRequest);
 
-                    //try adding bro
+                    //try creating bro
+                    Bro bro = BroServer.createBro(addBroRequest.getBroName());
 
+                    //try adding bro
+                    boolean broAdded = false;
+                    if(bro != null) {
+                        broAdded = BroServer.addBro(addBroRequest.getToken(), bro);
+                    } else
+
+                    System.out.println("Added bro successfully = " + broAdded);
 
                     break;
                 case UpdateLocation:
+                    //create request
+                    UpdateLocationRequest updateLocationRequest = new UpdateLocationRequest(serverRequest);
+
+                    //update user location
+                    boolean updated = BroServer.updateLocation(updateLocationRequest.getToken(),
+                            updateLocationRequest.getBroLocation());
+
+                    System.out.println("Updated location successfully = " + updated);
+
+
                     break;
                 case RemoveBro:
+
+                    //create request
+                    RemoveBroRequest removeBroRequest = new RemoveBroRequest(serverRequest);
+
+                    //try to remove bro
+                    boolean removed = BroServer.removeBro(removeBroRequest.getToken(), removeBroRequest.getBroName());
+
+                    System.out.println("Removed bro successfully = " + removed);
+
                     break;
                 case BlockBro:
                     break;

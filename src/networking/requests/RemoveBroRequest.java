@@ -1,13 +1,11 @@
 package networking.requests;
 
-import com.closestudios.bro.networking.DataMessage;
+import networking.DataMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Created by closestudios on 11/23/15.
- */
+
 public class RemoveBroRequest {
 
 

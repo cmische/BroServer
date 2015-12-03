@@ -1,17 +1,15 @@
 package server;
 
-import client.ClientRegisterThread;
 import networking.Bro;
+import networking.BroLocation;
 import networking.responses.SignInResponse;
 import objects.User;
-import server.Directory;
-import server.ServerMainThread;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.UUID;
 
 public class BroServer {
@@ -87,10 +85,10 @@ public class BroServer {
 
         for(int i=0;i<users.size();i++) {
             User currentUser = users.get(i);
-            if(currentUser.name.equals(name)) {
+            if(currentUser.broName.equals(name)) {
                 if(currentUser.password.equals(password)) {
                     System.out.println("Logging User In");
-                    return SignInResponse.createSuccessMessage(currentUser.uuid, currentUser.name);
+                    return SignInResponse.createSuccessMessage(currentUser.uuid, currentUser.broName);
                 } else {
                     System.out.println("Invalid Password");
                     return SignInResponse.createErrorMessage("Invalid password.");
@@ -108,7 +106,7 @@ public class BroServer {
             User currentUser = users.get(i);
             if(currentUser.uuid.equals(token)) {
                 System.out.println("Logging User In");
-                SignInResponse.createSuccessMessage(currentUser.uuid, currentUser.name);
+                SignInResponse.createSuccessMessage(currentUser.uuid, currentUser.broName);
             }
         }
 
@@ -130,7 +128,7 @@ public class BroServer {
     public static boolean existingBroName(String name) {
 
         for(int i=0;i<users.size();i++) {
-            if(users.get(i).name.equals(name)) {
+            if(users.get(i).broName.equals(name)) {
                 return true;
             }
         }
@@ -138,18 +136,94 @@ public class BroServer {
         return false;
     }
 
-    public static boolean createBro(String broName) {
+    public static Bro createBro(String broName) {
 
         for(User user: users) {
-            if (user.name.equals(broName)) {
-                Bro bro = new Bro()
+            if (user.broName.equals(broName)) {
+                Bro bro = new Bro(user.broName);
+                return bro;
             }
         }
+        return null;
+    }
 
+    public static boolean addBro(String uuid, Bro bro) {
+
+        for(User user: users) {
+            if (user.uuid.equals(uuid)) {
+                user.addBro(bro);
+                return true;
+            }
+        }
         return false;
     }
 
-    public static boolean addBro(String uuid) {
+    public static boolean removeBro(String uuid, String broName) {
+        //remove bro
+        for (User user: users) {
+            if (user.uuid.equals(uuid)) {
+                for (Bro bro: user.getBros()) {
+                    if (bro.broName.equals(broName)) {
+                        user.getBros().remove(bro);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean updateLocation(String uuid, BroLocation location) {
+        for (User user: users) {
+            if (user.uuid.equals(uuid)) {
+                user.location = location;
+                //find bros in area
+                checkForBrosInArea(user, location);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean checkForBrosInArea(User user, BroLocation location) {
+        //array to hold matches between user and bros
+        ArrayList<User> matches = new ArrayList<User>();
+
+        //match bros to users
+        outerLoop:
+        for (User matchUser: users) {
+            //check for matching user
+            for (Bro bro: user.getBros()) {
+                if (matchUser.broName.equals(bro.broName)) {
+                    matches.add(matchUser);
+                }
+                //check if users are all found
+                if (matches.size() == user.getBros().size()) {
+                    break outerLoop;
+                }
+            }
+        }
+
+        //check user locations for nearby bros
+        for(Bro bro : user.getBros()) {
+            for (int i = 0; i < matches.size(); i++)  {
+                if(matches.get(i).broName.equals(bro.broName)) {
+                    if (matches.get(i).nearBy(user.location) && bro.recentlyNearBy) {
+                        bro.recentlyNearBy = true;
+                        if (user.location.pingTime != null) {
+                            bro.totalTimeSecs += ((location.pingTime.getTime() - user.location.pingTime.getTime())/1000);
+                        }
+                        user.location.pingTime = new Date();
+                    } else {
+                        user.location.pingTime = null;
+                        bro.recentlyNearBy = false;
+                    }
+                    break;
+                }
+            }
+
+        }
+
+
         return false;
     }
 

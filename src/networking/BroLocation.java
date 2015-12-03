@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class BroLocation {
     public double latitude;
     public double longitude;
+    public Date pingTime;
 
     static float METERS_TO_MILES = 0.000621371f;
 

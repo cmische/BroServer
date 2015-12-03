@@ -1,6 +1,5 @@
 package server;
 
-import com.ndsucsci.DirectoryServer;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -8,9 +7,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-/**
- * Created by closestudios on 10/9/15.
- */
+
 public class ServerPingThread extends Thread {
 
     DatagramSocket pingSocket = null;
@@ -43,11 +40,11 @@ public class ServerPingThread extends Thread {
                 String userUUID = new String(pingMessage);
                 System.out.println("Received Ping From: " + userUUID);
 
-                try {
-                    DirectoryServer.pingUser(userUUID, packet.getAddress().getHostAddress());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    BroServer.pingUser(userUUID, packet.getAddress().getHostAddress());
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
 
             }
 
