@@ -12,9 +12,9 @@ public class User  implements Serializable{
     public String broName;
     public String password;
     public String gcm;
-    public BroLocation location = null;
+    public BroLocation location = new BroLocation();
     public ArrayList<Bro> bros = new ArrayList<Bro>();
-    public ArrayList<Bro> blocked = new ArrayList<Bro>();
+    public ArrayList<String> blocked = new ArrayList<String>();
 
     public User() {
 
@@ -26,7 +26,14 @@ public class User  implements Serializable{
         this.gcm = gcm;
     }
 
-    public ArrayList<Bro> getBros() {
+    public ArrayList<Bro> getBros(ArrayList<User> allUsers) {
+        for(User user : allUsers) {
+            for(Bro bro : bros) {
+                if(user.broName.equals(bro.broName)) {
+                    bro.location = user.location;
+                }
+            }
+        }
         return bros;
     }
 
@@ -38,11 +45,24 @@ public class User  implements Serializable{
         System.out.println(this.broName + " added " + bro.broName + " as a bro.");
     }
 
-    public void blockBro(Bro bro) {
-        if(bros.contains(bro)) {
-            bros.remove(bro);
+    public void blockBro(String broName) {
+        for(Bro bro : bros) {
+            if(bro.broName.equals(broName)) {
+                bros.remove(bro);
+                break;
+            }
         }
-        blocked.add(bro);
+        if(!blocked.contains(broName))
+            blocked.add(broName);
+    }
+
+    public void getBlock(String broName) {
+        for(Bro bro : bros) {
+            if(bro.broName.equals(broName)) {
+                bros.remove(bro);
+                break;
+            }
+        }
     }
 
     public void removeBro(Bro bro) {
@@ -54,13 +74,16 @@ public class User  implements Serializable{
         }
     }
 
-    public BroLocation compareLocation(BroLocation broLocation) {
+
+
+    public boolean broIsNearby(BroLocation broLocation) {
         double distance = distance(broLocation.latitude, this.location.latitude, broLocation.longitude,
                 this.location.longitude);
+
         if (distance <= 20) {
-            return this.location;
+            return true;
         }
-        return null;
+        return false;
     }
 
 

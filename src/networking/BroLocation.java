@@ -3,13 +3,14 @@ package networking;
 //import android.location.Location;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 
-public class BroLocation {
+public class BroLocation implements Serializable {
     public double latitude;
     public double longitude;
     public Date pingTime;
@@ -29,7 +30,7 @@ public class BroLocation {
         ArrayList<byte[]> broBlocks = DataMessage.getBlocks(bytes);
 
         latitude = Double.parseDouble(new String(broBlocks.get(0)));
-        latitude = Double.parseDouble(new String(broBlocks.get(1)));
+        longitude = Double.parseDouble(new String(broBlocks.get(1)));
 
     }
 

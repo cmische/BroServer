@@ -84,7 +84,6 @@ public class ServerProcessRequestThread extends Thread {
                     // response filled with bros
                     response = GetBrosResponse.createSuccessMessage(bros.toArray(new Bro[0]));
 
-                    System.out.println("Return bros.");
 
                     break;
                 case AddBro:
@@ -96,17 +95,14 @@ public class ServerProcessRequestThread extends Thread {
 
                     //try adding bro
                     if(bro != null) {
-                        ArrayList<Bro> addBroList = BroServer.addBro(addBroRequest.getToken(), bro);
-                        if (addBroList != null) {
-                            response = GetBrosResponse.createSuccessMessage(addBroList.toArray(new Bro[addBroList.size()]));
-                            System.out.println("Bro Added.");
+                        String resultAdd = BroServer.addBro(addBroRequest.getToken(), bro);
+                        if(resultAdd == null) {
+                            response = getBroResponse(addBroRequest.getToken());
                         } else {
-                            response = GetBrosResponse.createSuccessMessage(new Bro[0]);
-                            System.out.println("Failed to add bro");
+                            response = ErrorResponse.createMessage(false, resultAdd.getBytes());
                         }
                     } else {
-                        response = GetBrosResponse.createSuccessMessage(new Bro[0]);
-                        System.out.println("Failed to add bro");
+                        response = ErrorResponse.createMessage(false, "Bro Not Created".getBytes());
                     }
 
                     break;
@@ -132,7 +128,11 @@ public class ServerProcessRequestThread extends Thread {
                     boolean removed = BroServer.removeBro(removeBroRequest.getToken(), removeBroRequest.getBroName());
 
                     System.out.println("Removed bro successfully = " + removed);
-
+                    if(removed) {
+                        response = getBroResponse(removeBroRequest.getToken());
+                    } else {
+                        response = ErrorResponse.createMessage(false, "Bro Not Created".getBytes());
+                    }
                     break;
                 case BlockBro:
                     //create request
@@ -142,6 +142,11 @@ public class ServerProcessRequestThread extends Thread {
                     boolean blocked = BroServer.blockBro(blockBroRequest.getToken(), blockBroRequest.getBroName());
 
                     System.out.println("Blocked bro successfully = " + blocked);
+                    if(blocked) {
+                        response = getBroResponse(blockBroRequest.getToken());
+                    } else {
+                        response = ErrorResponse.createMessage(false, "Bro Not Created".getBytes());
+                    }
                     break;
                 case SignInToken:
                     // Create request
@@ -160,8 +165,10 @@ public class ServerProcessRequestThread extends Thread {
                             sendBroMessageRequest.getBroMessage());
 
                     if (messageSent) {
+                        response = ErrorResponse.createMessage(true, new byte[0]);
                         System.out.println("Your message has sent");
                     } else {
+                        response = ErrorResponse.createMessage(false, "Failed to send message".getBytes());
                         System.out.println("Failed to send message");
                     }
 
@@ -191,7 +198,7 @@ public class ServerProcessRequestThread extends Thread {
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if(clientSocket != null) {
@@ -202,6 +209,21 @@ public class ServerProcessRequestThread extends Thread {
                 }
             }
         }
+    }
+
+    public byte[] getBroResponse(String token) throws Exception {
+        byte[] response;
+
+        ArrayList<Bro> broList = BroServer.getBros(token);
+        if (broList != null) {
+            response = GetBrosResponse.createSuccessMessage(broList.toArray(new Bro[broList.size()]));
+            System.out.println("Response Created.");
+        } else {
+            response = GetBrosResponse.createSuccessMessage(new Bro[0]);
+            System.out.println("Failed to get bro response. Bro list is null");
+        }
+
+        return response;
     }
 
 }

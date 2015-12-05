@@ -16,36 +16,49 @@ public class GCMThread extends Thread {
         serverPort = port;
         this.toNumber = toNumber;
         this.messageID = messageID;
-
     }
 
     public void run() {
-
-
         try {
             socket = new Socket(InetAddress.getByName("gcm-http.googleapis.com"),serverPort);
             System.out.println("Started GCM communication on port: " + serverPort);
 
-            //write json string
-            String jsonString = "{\"to\":" + "\"" + toNumber + "\", \"data\":\"[\"messageID\":\"" + messageID + "\"]\"}";
+            System.out.println("Alert GCM of new message");
 
-            //send post request
-            BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
-            wr.write("POST " + "https://gcm-http.googleapis.com/gcm/send" + " HTTP/1.0\r\n");
-            wr.write("Content-Length: " + jsonString.length() + "\r\n");
-            wr.write("Content-Type: application/x-www-form-urlencoded;charset=UTF-8\r\n");
+            //write json
+            String jsonString = "{ \"to\" : \"" + toNumber + "\", \"data\" : {\"messageId\" : \""+messageID+"\"} }";
+
+            String hostname = "gcm-http.googleapis.com";
+            int port = 80;
+
+            InetAddress addr = InetAddress.getByName(hostname);
+            Socket socket = new Socket(addr, port);
+            String path = "/gcm/send";
+
+            // Send headers
+            BufferedWriter wr =
+                    new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
+            wr.write("POST "+path+" HTTP/1.0\r\n");
+            wr.write("Host: gcm-http.googleapis.com\r\n");
             wr.write("Authorization: key=AIzaSyAO39IewFjVE2Mdc4xq3et6j2w0lynoKM4\r\n");
+            wr.write("Content-Length: "+jsonString.length()+"\r\n");
+            wr.write("Content-Type: application/json\r\n");
             wr.write("\r\n");
 
+            // Send parameters
             wr.write(jsonString);
             wr.flush();
 
-            //read response
+            System.out.println("Request sent to GCM");
+
+            // Get response
             BufferedReader rd = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String line;
+
             while ((line = rd.readLine()) != null) {
                 System.out.println(line);
             }
+
             wr.close();
             rd.close();
 

@@ -51,18 +51,15 @@ public class BroServer {
     public static ArrayList<Bro> getBros(String uuid) throws IOException, InterruptedException {
         // Check for user
         for (User user: users) {
-            if(user.uuid == uuid) {
-                return user.getBros();
+            if(user.uuid.equals(uuid)) {
+                System.out.println("Return " + user.getBros(users).size() + " bros");
+                return user.getBros(users);
             }
         }
-
+        System.out.println("User not found. Can't return bros");
         return new ArrayList();
     }
 
-//    public static ArrayList<SearchResult> searchFiles(String query) {
-//        return directory.searchFiles(query, users);
-//    }
-//
     public static String signUpUser(String name, String password, String gcm) throws IOException, InterruptedException {
         // Create UUID for new computer
         String uuid = UUID.randomUUID().toString();
@@ -126,44 +123,57 @@ public class BroServer {
         for(User user: users) {
             if (user.broName.equals(broName)) {
                 Bro bro = new Bro(user.broName);
+                bro.location = user.location;
                 return bro;
             }
         }
+        System.out.println("User not found. Can't create Bro");
         return null;
     }
 
-    public static ArrayList<Bro> addBro(String uuid, Bro bro) {
+    public static String addBro(String uuid, Bro bro) throws IOException, InterruptedException {
 
-        for(User user: users) {
-            if (user.uuid.equals(uuid) && !user.getBros().contains(bro)) {
-                user.addBro(bro);
-                return user.getBros();
+        int requestUserID = -1;
+        int addUserID = -1;
+
+        for(int i=0;i<users.size();i++) {
+            if(users.get(i).uuid.equals(uuid)) {
+                requestUserID = i;
+                if(addUserID != -1) {
+                    break;
+                }
             }
-        }
-        return null;
-    }
-
-    public static boolean removeBro(String uuid, String broName) {
-        //remove bro
-        for (User user: users) {
-            if (user.uuid.equals(uuid)) {
-                for (Bro bro: user.getBros()) {
-                    if (bro.broName.equals(broName)) {
-                        user.getBros().remove(bro);
-                    }
+            if(users.get(i).broName.equals(bro.broName)) {
+                addUserID = i;
+                if(requestUserID != -1) {
+                    break;
                 }
             }
         }
-        return false;
+
+        if(users.get(addUserID).blocked.contains(users.get(requestUserID).broName)) {
+            return "User has blocked you";
+        }
+
+        if (!users.get(requestUserID).getBros(users).contains(bro)) {
+            users.get(requestUserID).addBro(bro);
+            saveUsers(); //save user with new bros
+            return null;
+        }
+
+        return "Error";
     }
 
-    public static boolean blockBro(String uuid, String broName) {
-        //block bro
+
+
+    public static boolean removeBro(String uuid, String broName) throws IOException, InterruptedException {
+        //remove bro
         for (User user: users) {
             if (user.uuid.equals(uuid)) {
-                for (Bro bro: user.getBros()) {
-                    if (bro.broName.equals(broName) && !user.blocked.contains(bro)) {
-                        user.blockBro(bro);
+                for (Bro bro: user.getBros(users)) {
+                    if (bro.broName.equals(broName)) {
+                        user.getBros(users).remove(bro);
+                        saveUsers();
                         return true;
                     }
                 }
@@ -172,12 +182,34 @@ public class BroServer {
         return false;
     }
 
+    public static boolean blockBro(String uuid, String broName) throws IOException, InterruptedException {
+        //block bro
+        User theBro = null;
+        for (User user: users) {
+            if (user.uuid.equals(uuid)) {
+                user.blockBro(broName);
+                theBro = user;
+            }
+        }
+        for (User user: users) {
+            if (user.broName.equals(broName)) {
+                user.getBlock(theBro.broName);
+            }
+        }
+
+        saveUsers();
+
+        return theBro != null;
+    }
+
     public static boolean updateLocation(String uuid, BroLocation location) {
         for (User user: users) {
             if (user.uuid.equals(uuid)) {
-                user.location = location;
+                location.pingTime = new Date();
+//                System.out.println("lat:" + location.latitude + "long:" + location.longitude);
                 //find bros in area
                 checkForBrosInArea(user, location);
+                user.location = location;
                 return true;
             }
         }
@@ -192,32 +224,31 @@ public class BroServer {
         outerLoop:
         for (User matchUser: users) {
             //check for matching user
-            for (Bro bro: user.getBros()) {
+            for (Bro bro: user.getBros(users)) {
                 if (matchUser.broName.equals(bro.broName)) {
                     matches.add(matchUser);
                 }
                 //check if users are all found
-                if (matches.size() == user.getBros().size()) {
+                if (matches.size() == user.getBros(users).size()) {
                     break outerLoop;
                 }
             }
         }
 
         //check user locations for nearby bros
-        for(Bro bro : user.getBros()) {
+        for(Bro bro : user.getBros(users)) {
             for (int i = 0; i < matches.size(); i++)  {
                 if(matches.get(i).broName.equals(bro.broName)) {
-                    BroLocation broCurrentLocation = matches.get(i).compareLocation(user.location);
-                    if ((broCurrentLocation != null) && bro.recentlyNearBy) {
-                        bro.location = broCurrentLocation;
+                    BroLocation broCurrentLocation = matches.get(i).location; //get bro location
+                    bro.location = broCurrentLocation;
+                    boolean nearby = matches.get(i).broIsNearby(user.location); //get if bro is nearby
+                    if (nearby && bro.recentlyNearBy) {
                         bro.recentlyNearBy = true;
                         if (user.location.pingTime != null) {
                             bro.totalTimeSecs += ((location.pingTime.getTime() - user.location.pingTime.getTime())/1000);
                         }
-                        user.location.pingTime = new Date();
                     } else {
-                        user.location.pingTime = null;
-                        bro.recentlyNearBy = false;
+                        bro.recentlyNearBy = nearby;
                     }
                     break;
                 }
@@ -264,7 +295,8 @@ public class BroServer {
         //notify bro using gcm
         for (User user: users) {
             if (user.broName.equals(broName)) {
-                new GCMThread(9096, user.gcm, message.messageID);
+                System.out.println("Start GCMThread.");
+                new GCMThread(80, user.gcm, message.messageID).start();
                 return true;
             }
         }
@@ -287,14 +319,14 @@ public class BroServer {
     public static void loadUsers() throws IOException, ClassNotFoundException {
         File file = new File("users.bytes");
         if(file.exists()) {
-            System.out.println("Loaded Users!");
             FileInputStream f = new FileInputStream(file);
             ObjectInputStream s = new ObjectInputStream(f);
             ArrayList<User> c = (ArrayList<User>) s.readObject();
+            System.out.println("Loaded " + c.size() + " Users!");
             s.close();
             users = c;
         } else {
-            System.out.println("New Users!");
+            System.out.println("0 Users!");
             users = new ArrayList<>();
         }
     }
@@ -316,14 +348,14 @@ public class BroServer {
     public static void loadMessages() throws IOException, ClassNotFoundException {
         File file = new File("messages.bytes");
         if(file.exists()) {
-            System.out.println("Loaded messages!");
             FileInputStream f = new FileInputStream(file);
             ObjectInputStream s = new ObjectInputStream(f);
             ArrayList<Message> c = (ArrayList<Message>) s.readObject();
+            System.out.println("Loaded " + c.size() + " messages!");
             s.close();
             messages = c;
         } else {
-            System.out.println("New messages!");
+            System.out.println("0 messages!");
             messages = new ArrayList<>();
         }
     }
@@ -333,7 +365,7 @@ public class BroServer {
             Thread.sleep(10);
         }
         messageLock = true;
-        File file = new File("message.bytes");
+        File file = new File("messages.bytes");
         FileOutputStream f = new FileOutputStream(file);
         ObjectOutputStream s = new ObjectOutputStream(f);
         s.writeObject(messages);
