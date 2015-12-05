@@ -6,9 +6,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-/**
- * Created by closestudios on 11/23/15.
- */
 public class DataMessage {
 
 
@@ -23,11 +20,20 @@ public class DataMessage {
         allData = new ArrayList<>();
     }
 
-    public void getBytesFromInput(InputStream is) throws IOException {
+    public void getBytesFromInput(InputStream is) throws Exception {
         byte[] data = new byte[1024];
-        while(!receivedRequest()) {
+        int noDataCheck = 0;
+        while(!receivedRequest() && noDataCheck < 5) {
             int length = is.read(data, 0, data.length);
+            if(length == 0) {
+                noDataCheck ++;
+            } else if(length == -1) {
+                noDataCheck = 10;
+            }
             receivedBytes(data, length);
+        }
+        if(noDataCheck >= 5) {
+            throw new Exception("Disconnected");
         }
     }
 
@@ -54,7 +60,7 @@ public class DataMessage {
         if(dataLengthReceived < 4) {
             return 99999;
         }
-        int length = ByteBuffer.wrap(dataSize).getInt();
+        int length = java.nio.ByteBuffer.wrap(dataSize).getInt();
         return length;
     }
 
@@ -123,7 +129,7 @@ public class DataMessage {
             blockLength[3] = data[processingData];
             processingData ++;
 
-            int blockSize = ByteBuffer.wrap(blockLength).getInt();
+            int blockSize = java.nio.ByteBuffer.wrap(blockLength).getInt();
 
             byte[] block = new byte[blockSize];
             for(int i=0;i<block.length;i++) {

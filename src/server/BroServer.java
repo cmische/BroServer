@@ -316,6 +316,14 @@ public class BroServer {
         return null;
     }
 
+//    public static void lotsOfUsers() {
+//        for (int i = 0; i<200000; i++) {
+//            User user = new User();
+//            while(repeatMess)
+//            user.location =
+//        }
+//    }
+
     public static void loadUsers() throws IOException, ClassNotFoundException {
         File file = new File("users.bytes");
         if(file.exists()) {
