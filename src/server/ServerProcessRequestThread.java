@@ -184,7 +184,7 @@ public class ServerProcessRequestThread extends Thread {
                     //respond with message
                     if (message != null) {
                         response = BroMessageResponse.createSuccessMessage(new BroMessage(message.messageTitle,
-                                message.messageDetails, message.audioBytes));
+                                message.messageDetails, message.audioBytes, message.extension));
                     } else {
                         response = BroMessageResponse.createErrorMessage("Failed to get message");
                     }

@@ -12,7 +12,7 @@ public class Message extends BroMessage implements Serializable {
     }
 
     public Message (BroMessage message, String messageID) {
-        super(message.messageTitle, message.messageDetails, message.audioBytes);
+        super(message.messageTitle, message.messageDetails, message.audioBytes, message.extension);
         this.messageID = messageID;
     }
 }
