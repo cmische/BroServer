@@ -36,4 +36,5 @@ public class AddBroRequest {
 
         return ServerRequest.createMessage(DataMessage.createBlocks(data), ServerRequest.ServerRequestType.AddBro);
     }
+
 }
